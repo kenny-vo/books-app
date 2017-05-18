@@ -22,19 +22,9 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-
-////////////////////
-//  DATA
-///////////////////
-
-var newBookUUID = 18;
-
-
 ////////////////////
 //  ROUTES
 ///////////////////
-
-
 
 
 // define a root route: localhost:3000/
@@ -63,10 +53,8 @@ app.get('/api/books/:id', function (req, res) {
   db.Book.findOne( {_id: bookId})
   .populate('author')
   .exec( function (err, foundBook) {
-      if (err) {
-        return console.log(err);
-      }
-      res.json(foundBook)
+      if (err) { return console.log(err); }
+      res.json(foundBook);
     });
 });
 
@@ -74,11 +62,26 @@ app.get('/api/books/:id', function (req, res) {
 app.post('/api/books', function (req, res) {
   // create new book with form data (`req.body`)
   console.log('books create', req.body);
-  var newBook = req.body;
-  db.Book.create(newBook, function(err, createBook){
-    if(err){return console.log(error)}
-    res.json(createdBook);
-  })
+  var newBook = new db.Book({
+    title:req.body.title,
+    image: req.body.image,
+    releaseDate: req.body.releaseDate,
+  });
+
+  // find by author
+  db.Author.findOne({name: req.body.author}, function(err, author){
+    if(err) { return console.log(err); }
+    // add this Author
+    newBook.author = author;
+    // save NewBook to database
+    newBook.save(function(err, book){
+      if (err) { return console.log(err);
+      }
+      console.log("saved", book.title);
+      res.json(book);
+    });
+  });
+
 });
 
 // update book
