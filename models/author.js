@@ -7,6 +7,4 @@ var AuthorSchema = new Schema({
   image: String
 });
 
-var Author = mongoose.model('Author', AuthorSchema);
-
-module.exports = Author;
+module.exports = mongoose.model('Author', AuthorSchema);
